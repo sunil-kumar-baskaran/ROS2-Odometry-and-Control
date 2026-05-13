@@ -6,9 +6,11 @@
 
     <!-- Include Gazebo Parameters-->
     <xacro:include filename="$(find bumper_bot_description)/urdf/bumperbot_gazebo.xacro"/>
+    <xacro:bumperbot_gazebo is_ignition="$(arg is_ignition)" />
 
     <!-- Ros2 control-->
     <xacro:include filename="$(find bumper_bot_description)/urdf/bumperbot_ros2_control.xacro"/>
+    <xacro:bumperbot_ros2_control is_ignition="$(arg is_ignition)" />
 
     <link name="base_footprint"/>
 

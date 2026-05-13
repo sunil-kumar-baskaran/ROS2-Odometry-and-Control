@@ -12,10 +12,15 @@
 
   <exec_depend>ros2launch</exec_depend>
   <exec_depend>controller_manager</exec_depend>
+  <exec_depend>ros2_controllers</exec_depend>
+  <exec_depend>ros2_control</exec_depend>
+  <exec_depend>joy</exec_depend>
+  <exec_depend>joy_teleop</exec_depend>
 
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
+  <depend>python3-numpy</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

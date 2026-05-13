@@ -2,7 +2,7 @@ joystick:
   ros__parameters:
     device_id: 0
     device_name: ""
-    deadzon: 0.5
+    deadzone: 0.5
     autorepeat_rate: 20.0
     sticky_buttons: False
-    colaesce_interval_ms: 1
+    coalesce_interval_ms: 1

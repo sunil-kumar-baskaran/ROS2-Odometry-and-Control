@@ -1,0 +1,63 @@
+# =========================
+# ROS 2 / Colcon
+# =========================
+build/
+install/
+log/
+logs/
+ament_cmake_index/
+ament_index/
+
+# Colcon metadata
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Python virtual environments (if used)
+venv/
+.venv/
+env/
+.env/
+
+# ROS 2 launch / runtime artifacts (optional)
+*.bag
+*.db3
+*.sqlite3
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# =========================
+# Python / tooling
+# =========================
+*.egg-info/
+dist/
+.eggs/
+pip-wheel-metadata/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# =========================
+# OS-specific
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# CMake / build system leftovers
+# =========================
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json

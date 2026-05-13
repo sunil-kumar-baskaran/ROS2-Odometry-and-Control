@@ -10,6 +10,10 @@ from ament_index_python.packages import get_package_share_directory
 import os
     
 def generate_launch_description():
+    use_sim_time_arg = DeclareLaunchArgument(
+        "use_sim_time",
+        default_value="True",
+    )
     
     use_python_arg = DeclareLaunchArgument(
         name="use_python",
@@ -26,6 +30,7 @@ def generate_launch_description():
         default_value="0.17"
     )
     
+    use_sim_time = LaunchConfiguration("use_sim_time")
     use_python_conf = LaunchConfiguration("use_python")
     wheel_radius = LaunchConfiguration("wheel_radius")
     wheel_separation = LaunchConfiguration("wheel_separation")
@@ -36,8 +41,9 @@ def generate_launch_description():
         arguments=[
                     "joint_state_broadcaster",
                     "--controller-manager",
-                    "/controller_manager"
-        ]
+                    "controller_manager"
+        ],
+        parameters=[{"use_sim_time": use_sim_time}]
     )
     
     velocity_controller_spawner =  Node(
@@ -46,20 +52,23 @@ def generate_launch_description():
         arguments=[
                     "simple_velocity_controller",
                     "--controller-manager",
-                    "/controller_manager"
-        ]
+                    "controller_manager"
+        ],
+        parameters=[{"use_sim_time": use_sim_time}]
     )
     
     simple_controller = Node(
         package="bumperbot_controllers",
         executable="simple_controller.py",
         parameters=[{"wheel_radius":wheel_radius, 
-                     "wheel_separation":wheel_separation}],
+                     "wheel_separation":wheel_separation,
+                     "use_sim_time": use_sim_time}],
         condition=IfCondition(use_python_conf)
     )
     
     return LaunchDescription([
         # 1. ALWAYS declare arguments first
+            use_sim_time_arg,
             wheel_radius_arg,
             wheel_separation_arg,
             use_python_arg,

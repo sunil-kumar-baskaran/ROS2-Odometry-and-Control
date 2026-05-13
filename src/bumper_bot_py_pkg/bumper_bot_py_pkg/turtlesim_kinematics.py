@@ -46,8 +46,8 @@ def main():
     rclpy.init()
     simple_turtlesim_kinematics = SimpleTurtlesimKinematics()
     rclpy.spin(simple_turtlesim_kinematics)
-    simple_turtlesim_kinematics.destroy_node
+    simple_turtlesim_kinematics.destroy_node()
     rclpy.shutdown()
 
-if __name__ == '__main_':
+if __name__ == '__main__':
     main()
