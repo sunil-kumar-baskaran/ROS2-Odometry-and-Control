@@ -27,7 +27,10 @@ setup(
             'simple_publisher = bumper_bot_py_pkg.simple_publisher_file:main',
             'simple_subscriber = bumper_bot_py_pkg.simple_subscriber_file:main',  
             'simple_parameter = bumper_bot_py_pkg.simple_parameter:main',
-            'simple_turtlesim_kinematics = bumper_bot_py_pkg.turtlesim_kinematics:main'          
+            'simple_turtlesim_kinematics = bumper_bot_py_pkg.turtlesim_kinematics:main',
+            'simple_tf_kinematics = bumper_bot_py_pkg.simple_tf_kinematics:main',
+            'simple_service_server = bumper_bot_py_pkg.simple_service_server:main',
+            
         ],
     },
 )
