@@ -66,12 +66,12 @@ def generate_launch_description():
         package="ros_gz_bridge",
         executable="parameter_bridge",
         arguments=[
-            "/clock@ros_gz_interfaces/msg/Clock[gz.msgs.Clock"
+            "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock"
         ],
         output="screen"
     )
 
-    
+    '''
     controller_launch = IncludeLaunchDescription(
     PythonLaunchDescriptionSource([
         os.path.join(get_package_share_directory("bumperbot_controllers"), "launch", "controller.launch.py")
@@ -84,7 +84,7 @@ def generate_launch_description():
         actions=[controller_launch]
     )
 
-    '''
+    
     delay_controller_after_spawn = RegisterEventHandler(
     event_handler=OnProcessExit(
         target_action=gz_spawn_entity,

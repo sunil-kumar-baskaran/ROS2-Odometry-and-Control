@@ -10,11 +10,12 @@ from ament_index_python.packages import get_package_share_directory
 import os
     
 def generate_launch_description():
- 
+    '''
     use_sim_time_arg = DeclareLaunchArgument(
         "use_sim_time",
         default_value="True",
     )
+    '''
 
     use_python_arg = DeclareLaunchArgument(
         name="use_python",
@@ -36,7 +37,7 @@ def generate_launch_description():
         default_value="True"
     )
     
-    use_sim_time = LaunchConfiguration("use_sim_time")
+    # use_sim_time = LaunchConfiguration("use_sim_time")
     use_python_conf = LaunchConfiguration("use_python")
     wheel_radius = LaunchConfiguration("wheel_radius")
     wheel_separation = LaunchConfiguration("wheel_separation")
@@ -52,7 +53,7 @@ def generate_launch_description():
                     "--controller-manager",
                     "/controller_manager"
         ],
-        parameters=[{"use_sim_time": use_sim_time}]
+        #parameters=[{"use_sim_time": use_sim_time}]
     )
 
     bumperbots_diff_drive_controller_spawner =  Node(
@@ -63,7 +64,7 @@ def generate_launch_description():
                     "--controller-manager",
                     "/controller_manager"
         ],
-        parameters=[{"use_sim_time": use_sim_time}],
+        #parameters=[{"use_sim_time": use_sim_time}],
         condition=UnlessCondition(use_simple_vel_cntrlrs_conf)
     )
     
@@ -78,15 +79,14 @@ def generate_launch_description():
                             "--controller-manager",
                             "/controller_manager"
                             ],
-                parameters=[{"use_sim_time": use_sim_time}]
+                #parameters=[{"use_sim_time": use_sim_time}]
             ),
 
-            Node(      # USES OUR OWN CONTROLLER WRITTEN USING DIFFEENTIAL KINEMATICS (LIN X TO WHEEL ROTATIONS) CALCULTION
+            Node(      # USES OUR OWN CONTROLLER
                 package="bumperbot_controllers",
                 executable="simple_controller.py",
                 parameters=[{"wheel_radius":wheel_radius, 
-                            "wheel_separation":wheel_separation,  
-                            "use_sim_time": use_sim_time}],
+                            "wheel_separation":wheel_separation}], #"use_sim_time": use_sim_time
                 condition=IfCondition(use_python_conf)
             )
         ]
@@ -96,7 +96,7 @@ def generate_launch_description():
     
     return LaunchDescription([
         # 1. ALWAYS declare arguments first
-            use_sim_time_arg,
+            #use_sim_time_arg,
             wheel_radius_arg,
             wheel_separation_arg,
             use_python_arg,
