@@ -2,7 +2,7 @@
 
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import TwistStamped, TransformStamped
 from std_msgs.msg import Float64MultiArray
 import numpy as np
 from sensor_msgs.msg import JointState
@@ -11,6 +11,8 @@ from rclpy.constants import S_TO_NS
 from nav_msgs.msg import Odometry
 import math
 from tf_transformations import quaternion_from_euler
+
+from tf2_ros import TransformBroadcaster
 
 class SimpleController(Node):
     def __init__(self):
@@ -45,7 +47,7 @@ class SimpleController(Node):
         
         self.joint_sub_ = self.create_subscription(JointState, "joint_states", self.jointCallback, 10)
 
-        # publish quaternion messages using the linear, angular velocities & posiiton and orientation calculated here
+        # publish quaternion messages for position and orientation & linear, angular velocities calculated here
         self.odom_pub_ = self.create_publisher(Odometry, "bumperbot_controllers/odom", 10)
         self.odom_msg_ = Odometry()
         self.odom_msg_.header.frame_id = "odom"
@@ -54,6 +56,14 @@ class SimpleController(Node):
         self.odom_msg_.pose.pose.orientation.y = 0.0
         self.odom_msg_.pose.pose.orientation.z = 0.0
         self.odom_msg_.pose.pose.orientation.w = 1.0
+
+        self.transform_stamped_ = TransformStamped()
+        self.transform_broadcaster_ =  TransformBroadcaster(self)
+
+        self.transform_stamped_.header.frame_id = "odom"
+        self.transform_stamped_.child_frame_id = "base_footprint"
+        
+
         
         self.speed_conversion_ = np.array([
                                     [self.wheel_radius_/2 , self.wheel_radius_/2],
@@ -109,8 +119,19 @@ class SimpleController(Node):
         self.odom_msg_.twist.twist.linear.x = linear
         self.odom_msg_.twist.twist.angular.z = angular
         self.odom_msg_.header.stamp = self.get_clock().now().to_msg()
-
+        
         self.odom_pub_.publish(self.odom_msg_)
+
+        self.transform_stamped_.transform.translation.x = self.x_
+        self.transform_stamped_.transform.translation.y = self.y_
+        self.transform_stamped_.transform.translation.z = 0.0
+        self.transform_stamped_.transform.rotation.x = q[0]
+        self.transform_stamped_.transform.rotation.y = q[1]
+        self.transform_stamped_.transform.rotation.z = q[2]
+        self.transform_stamped_.transform.rotation.w = q[3]
+        self.transform_stamped_.header.stamp = self.get_clock().now().to_msg()
+
+        self.transform_broadcaster_.sendTransform(self.transform_stamped_)
         
 
 def main(args =  None):
