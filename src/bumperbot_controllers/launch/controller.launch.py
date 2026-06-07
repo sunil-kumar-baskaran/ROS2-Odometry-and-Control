@@ -1,6 +1,6 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument, GroupAction
+from launch.actions import DeclareLaunchArgument, GroupAction, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 from launch.conditions import IfCondition, UnlessCondition
 
@@ -8,14 +8,30 @@ from launch.substitutions import Command
 from launch_ros.parameter_descriptions import ParameterValue
 from ament_index_python.packages import get_package_share_directory
 import os
-    
+
+def noisy_controller(context, *args, **kargs):
+    wheel_radius_conf = float(LaunchConfiguration("wheel_radius").perform(context))
+    wheel_separation_conf = float(LaunchConfiguration("wheel_separation").perform(context))
+    wheel_radius_error_conf = float(LaunchConfiguration("wheel_radius_error").perform(context))
+    wheel_separation_error_conf = float(LaunchConfiguration("wheel_separation_error").perform(context))
+
+    noisy_controller_py = Node(
+        package="bumperbot_controllers",
+        executable="noisy_controller.py",
+        parameters=[
+            {"wheel_radius": wheel_radius_conf + wheel_radius_error_conf,
+            "wheel_separation": wheel_separation_conf + wheel_separation_error_conf}
+            ]
+    )
+    return [noisy_controller_py]
+
+
 def generate_launch_description():
-    '''
+   
     use_sim_time_arg = DeclareLaunchArgument(
         "use_sim_time",
         default_value="True",
     )
-    '''
 
     use_python_arg = DeclareLaunchArgument(
         name="use_python",
@@ -37,7 +53,18 @@ def generate_launch_description():
         default_value="True"
     )
     
-    # use_sim_time = LaunchConfiguration("use_sim_time")
+    wheel_radius_error_arg = DeclareLaunchArgument(
+        name="wheel_radius_error",
+        default_value="0.005"
+    )
+
+    wheel_separation_error_arg = DeclareLaunchArgument(
+        name="wheel_separation_error",
+        default_value="0.02"
+    )
+    
+    
+    use_sim_time = LaunchConfiguration("use_sim_time")
     use_python_conf = LaunchConfiguration("use_python")
     wheel_radius = LaunchConfiguration("wheel_radius")
     wheel_separation = LaunchConfiguration("wheel_separation")
@@ -53,7 +80,7 @@ def generate_launch_description():
                     "--controller-manager",
                     "/controller_manager"
         ],
-        #parameters=[{"use_sim_time": use_sim_time}]
+        parameters=[{"use_sim_time": use_sim_time}]
     )
 
     bumperbots_diff_drive_controller_spawner =  Node(
@@ -64,7 +91,7 @@ def generate_launch_description():
                     "--controller-manager",
                     "/controller_manager"
         ],
-        #parameters=[{"use_sim_time": use_sim_time}],
+        parameters=[{"use_sim_time": use_sim_time}],
         condition=UnlessCondition(use_simple_vel_cntrlrs_conf)
     )
     
@@ -79,32 +106,38 @@ def generate_launch_description():
                             "--controller-manager",
                             "/controller_manager"
                             ],
-                #parameters=[{"use_sim_time": use_sim_time}]
+                parameters=[{"use_sim_time": use_sim_time}]
             ),
 
             Node(      # USES OUR OWN CONTROLLER
                 package="bumperbot_controllers",
                 executable="simple_controller.py",
                 parameters=[{"wheel_radius":wheel_radius, 
-                            "wheel_separation":wheel_separation}], #"use_sim_time": use_sim_time
+                            "wheel_separation":wheel_separation,
+                            "use_sim_time": use_sim_time}], #"use_sim_time": use_sim_time
                 condition=IfCondition(use_python_conf)
             )
         ]
     )
 
+    noisy_controller_launch = OpaqueFunction(function=noisy_controller)
+
     
     
     return LaunchDescription([
         # 1. ALWAYS declare arguments first
-            #use_sim_time_arg,
+            use_sim_time_arg,
             wheel_radius_arg,
             wheel_separation_arg,
             use_python_arg,
             use_simple_vel_cntrlrs_arg,
+            wheel_radius_error_arg,
+            wheel_separation_error_arg,
         # 2. Then list the nodes that use them
             joint_state_broadcaster_spawner,
             bumperbots_diff_drive_controller_spawner,
-            use_simple_vel_cntrlrs
+            use_simple_vel_cntrlrs,
+            noisy_controller_launch
     ])
        
 # In ROS 2, the LaunchDescription processes items in the order they appear in the list. 
